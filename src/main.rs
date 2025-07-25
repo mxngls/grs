@@ -34,6 +34,10 @@ fn main() -> Result<(), git2::Error> {
     repo.stash_foreach(stash_cb)?;
 
     for (index, _message, id) in stashes {
+        if index != stash_index.into() {
+            continue;
+        }
+
         let commit = repo.find_commit(id)?;
         let tree = commit.tree()?;
         let parents = commit
@@ -60,11 +64,8 @@ fn main() -> Result<(), git2::Error> {
         repo.stash_drop(index)?;
 
         // update stash references
-        repo.reference("refs/stash", new_commit, true, "Updated stash message")?;
-
-        if index == stash_index.into() {
-            break;
-        }
+        // NOTE: the log messages of the stash reflog default to the commit messages of each stash
+        repo.reference("refs/stash", new_commit, true, &new_message)?;
     }
 
     Ok(())
