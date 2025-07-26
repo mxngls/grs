@@ -12,20 +12,20 @@ impl TestRepo {
 
         // initialize git repo
         Command::new("git")
-            .args(&["init"])
+            .args(["init"])
             .current_dir(repo_path)
             .output()
             .expect("Failed to init git repo");
 
         // configure git
         Command::new("git")
-            .args(&["config", "user.name", "Test User"])
+            .args(["config", "user.name", "Test User"])
             .current_dir(repo_path)
             .output()
             .expect("Failed to configure git");
 
         Command::new("git")
-            .args(&["config", "user.email", "test@example.com"])
+            .args(["config", "user.email", "test@example.com"])
             .current_dir(repo_path)
             .output()
             .expect("Failed to configure git email");
@@ -35,13 +35,13 @@ impl TestRepo {
             .expect("Failed to write initial file");
 
         Command::new("git")
-            .args(&["add", "."])
+            .args(["add", "."])
             .current_dir(repo_path)
             .output()
             .expect("Failed to add initial files");
 
         Command::new("git")
-            .args(&["commit", "-m", "Initial commit"])
+            .args(["commit", "-m", "Initial commit"])
             .current_dir(repo_path)
             .output()
             .expect("Failed to create initial commit");
@@ -59,13 +59,13 @@ impl TestRepo {
             .expect("Failed to write file");
 
         Command::new("git")
-            .args(&["add", "."])
+            .args(["add", "."])
             .current_dir(self.path())
             .output()
             .expect("Failed to add files");
 
         Command::new("git")
-            .args(&["stash", "push", "-m", message])
+            .args(["stash", "push", "-m", message])
             .current_dir(self.path())
             .output()
             .expect("Failed to create stash");
@@ -73,7 +73,7 @@ impl TestRepo {
 
     fn get_stash_messages(&self) -> Vec<String> {
         let output = Command::new("git")
-            .args(&["stash", "list", "--format=%s"])
+            .args(["stash", "list", "--format=%s"])
             .current_dir(self.path())
             .output()
             .expect("Failed to get stash list");
@@ -98,7 +98,7 @@ impl TestRepo {
 
     fn get_stash_count(&self) -> usize {
         let output = Command::new("git")
-            .args(&["stash", "list"])
+            .args(["stash", "list"])
             .current_dir(self.path())
             .output()
             .expect("Failed to get stash list");
@@ -109,7 +109,7 @@ impl TestRepo {
 
     fn run_git_rename_stash(&self, message: &str, index: usize) -> std::process::Output {
         Command::new("cargo")
-            .args(&[
+            .args([
                 "run",
                 "--",
                 "-r",
@@ -225,13 +225,13 @@ fn test_stash_functionality_preserved() {
         .expect("Failed to modify work file");
 
     Command::new("git")
-        .args(&["add", "."])
+        .args(["add", "."])
         .current_dir(repo.path())
         .output()
         .expect("Failed to add files");
 
     Command::new("git")
-        .args(&["stash", "push", "-m", "Work in progress"])
+        .args(["stash", "push", "-m", "Work in progress"])
         .current_dir(repo.path())
         .output()
         .expect("Failed to create stash");
@@ -242,7 +242,7 @@ fn test_stash_functionality_preserved() {
 
     // verify stash can still be applied
     let output = Command::new("git")
-        .args(&["stash", "pop"])
+        .args(["stash", "pop"])
         .current_dir(repo.path())
         .output()
         .expect("Failed to pop stash");
