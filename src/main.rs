@@ -1,5 +1,5 @@
 use argh::FromArgs;
-use git2::{Oid, Repository};
+use git2::{Commit, Oid, Repository};
 
 #[derive(FromArgs)]
 /// Arguments to pass to the rename utility
@@ -41,26 +41,22 @@ fn main() -> Result<(), git2::Error> {
         target_stash.ok_or_else(|| git2::Error::from_str("Stash not found"))?;
 
     let commit = repo.find_commit(commit_id)?;
-    let tree = commit.tree()?;
-    let parents = commit
-        .parents()
-        .map(|p| repo.find_commit(p.id()))
-        .collect::<Result<Vec<_>, _>>()?;
-    let parent_refs: Vec<&git2::Commit> = parents.iter().collect();
-
     let new_commit = repo.commit(
         None,
         &commit.author(),
         &commit.committer(),
         &new_message,
-        &tree,
-        &parent_refs,
+        &commit.tree()?,
+        &commit
+            .parents()
+            .map(|p| repo.find_commit(p.id()))
+            .collect::<Result<Vec<Commit>, _>>()?
+            .iter()
+            .collect::<Vec<&Commit>>(),
     )?;
 
     // let us work with `repo` in peace
     drop(commit);
-    drop(tree);
-    drop(parents);
 
     // drop existing stash
     repo.stash_drop(index)?;
